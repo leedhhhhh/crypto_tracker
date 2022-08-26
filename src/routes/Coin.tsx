@@ -3,13 +3,21 @@ import { useQuery } from "react-query";
 import { Route, Routes, useMatch } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { useLocation, useParams } from "react-router-dom";
-import styled from "styled-components";
+import styled, { ThemeProvider } from "styled-components";
 import { fetchCoinInfo, fetchCoinTickers } from "../api";
 import Chart from "./Chart";
 import Price from "./Price";
+import { Helmet } from "react-helmet";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHouse } from "@fortawesome/free-solid-svg-icons";
+import { faBolt } from "@fortawesome/free-solid-svg-icons";
+import { useSetRecoilState } from "recoil";
+import { isDarkAtom } from "../atoms";
 
 const Container = styled.div`
   padding: 0px 20px;
+  max-width: 480px;
+  margin: 0 auto;
 `;
 
 const Header = styled.header`
@@ -17,6 +25,12 @@ const Header = styled.header`
   display: flex;
   justify-content: center;
   align-items: center;
+`;
+
+const HomeBtn = styled.div`
+  display: flex;
+  padding-top: 50px;
+  justify-content: space-between;
 `;
 
 const Title = styled.h1`
@@ -35,6 +49,7 @@ const Overview = styled.div`
   padding: 10px 20px;
   border-radius: 10px;
 `;
+
 const OverviewItem = styled.div`
   display: flex;
   flex-direction: column;
@@ -46,6 +61,7 @@ const OverviewItem = styled.div`
     margin-bottom: 5px;
   }
 `;
+
 const Description = styled.p`
   margin: 20px 0px;
 `;
@@ -141,7 +157,11 @@ interface PriceData {
   };
 }
 
+interface ICoinProps {}
+
 function Coin() {
+  const setDarkAtom = useSetRecoilState(isDarkAtom);
+  const toggleDarkAtom = () => setDarkAtom((prev) => !prev);
   const { coinId } = useParams();
   const { state } = useLocation() as LocationState;
   const chartMatch = useMatch("/:coinId/chart");
@@ -152,7 +172,10 @@ function Coin() {
   );
   const { isLoading: tickersLoading, data: tickersData } = useQuery<PriceData>(
     ["tickers", coinId],
-    () => fetchCoinTickers(coinId)
+    () => fetchCoinTickers(coinId),
+    {
+      refetchInterval: 5000,
+    }
   );
 
   // const [loading, setLoading] = useState(true);
@@ -175,6 +198,17 @@ function Coin() {
   const loading = infoLoading || tickersLoading;
   return (
     <Container>
+      <Helmet>
+        <title>
+          {state?.name ? state?.name : loading ? "Loading.." : infoData?.name}
+        </title>
+      </Helmet>
+      <HomeBtn>
+        <Link to="/">
+          <FontAwesomeIcon icon={faHouse} />
+        </Link>
+        <FontAwesomeIcon icon={faBolt} onClick={toggleDarkAtom} />
+      </HomeBtn>
       <Header>
         <Title>
           {state?.name ? state?.name : loading ? "Loading.." : infoData?.name}
@@ -194,8 +228,8 @@ function Coin() {
               <span>${infoData?.symbol}</span>
             </OverviewItem>
             <OverviewItem>
-              <span>Open Source:</span>
-              <span>{infoData?.open_source ? "Yes" : "No"}</span>
+              <span>Price:</span>
+              <span>${tickersData?.quotes.USD.price.toFixed(2)}</span>
             </OverviewItem>
           </Overview>
           <Description>{infoData?.description}</Description>
@@ -218,7 +252,7 @@ function Coin() {
             </Tab>
           </Tabs>
           <Routes>
-            <Route path="chart" element={<Chart></Chart>} />
+            <Route path="chart" element={<Chart coinId={coinId}></Chart>} />
             <Route path="price" element={<Price></Price>} />
           </Routes>
         </>

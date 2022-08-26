@@ -1,6 +1,14 @@
-import { createGlobalStyle } from "styled-components";
+import styled, { createGlobalStyle, ThemeProvider } from "styled-components";
 import Router from "./Router";
 import { ReactQueryDevtools } from "react-query/devtools";
+import { darkTheme, lightTheme } from "./theme";
+import { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBolt } from "@fortawesome/free-solid-svg-icons";
+import { faHouse } from "@fortawesome/free-solid-svg-icons";
+import { Link } from "react-router-dom";
+import { useRecoilValue } from "recoil";
+import { isDarkAtom } from "./atoms";
 
 const GlobalStyle = createGlobalStyle`
 @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400&display=swap');
@@ -65,12 +73,25 @@ a {
 }
 `;
 
+const Headers = styled.div`
+  padding-top: 10px;
+  padding-left: 10px;
+`;
+
 function App() {
+  // const [isDark, setIsDark] = useState(true);
+  // const toggleDark = () => setIsDark((current) => !current); 밑에코드로
+  const isDark = useRecoilValue(isDarkAtom);
   return (
     <>
-      <GlobalStyle></GlobalStyle>
-      <Router></Router>
-      <ReactQueryDevtools initialIsOpen={true}></ReactQueryDevtools>
+      {/* <Headers>
+        <FontAwesomeIcon icon={faBolt} onClick={toggleDark} />
+      </Headers> */}
+      <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
+        <GlobalStyle></GlobalStyle>
+        <Router></Router>
+        {/* <ReactQueryDevtools initialIsOpen={true}></ReactQueryDevtools> */}
+      </ThemeProvider>
     </>
   );
 }

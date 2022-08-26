@@ -1,11 +1,18 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
+import { Helmet } from "react-helmet";
 import { useQuery } from "react-query";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { fetchCoins } from "../api";
+import { faBolt, faHouse } from "@fortawesome/free-solid-svg-icons";
+import { useSetRecoilState } from "recoil";
+import { isDarkAtom } from "../atoms";
 
 const Container = styled.div`
   padding: 0px 20px;
+  max-width: 480px;
+  margin: 0 auto;
 `;
 
 const Header = styled.header`
@@ -15,13 +22,20 @@ const Header = styled.header`
   align-items: center;
 `;
 
+const HomeBtn = styled.div`
+  display: flex;
+  padding-top: 50px;
+  justify-content: space-between;
+`;
+
 const CoinsList = styled.ul``;
 
 const Coin = styled.li`
-  background-color: white;
-  color: ${(props) => props.theme.bgColor};
+  background-color: ${(props) => props.theme.cardBgColor};
+  color: ${(props) => props.theme.textColor};
   border-radius: 15px;
   margin-bottom: 10px;
+  border: 1px solid white;
   a {
     padding: 20px;
     align-items: center;
@@ -60,7 +74,11 @@ interface ICoinInterface {
   type: string;
 }
 
+interface ICoinsProps {}
+
 function Coins() {
+  const setDarkAtom = useSetRecoilState(isDarkAtom);
+  const toggleDarkAtom = () => setDarkAtom((prev) => !prev);
   const { isLoading, data } = useQuery<ICoinInterface[]>("allCoins", () =>
     fetchCoins()
   );
@@ -78,6 +96,15 @@ function Coins() {
 
   return (
     <Container>
+      <Helmet>
+        <title>Coins</title>
+      </Helmet>
+      <HomeBtn>
+        <Link to="/">
+          <FontAwesomeIcon icon={faHouse} />
+        </Link>
+        <FontAwesomeIcon icon={faBolt} onClick={toggleDarkAtom} />
+      </HomeBtn>
       <Header>
         <Title>Coins</Title>
       </Header>
