@@ -87,9 +87,6 @@ const Tab = styled.span<isActive>`
   border-radius: 10px;
   color: ${(props) =>
     props.isActive ? props.theme.accentColor : props.theme.textColor};
-  a {
-    display: block;
-  }
 `;
 
 interface RouteParams {
@@ -253,7 +250,7 @@ function Coin() {
           </Tabs>
           <Routes>
             <Route path="chart" element={<Chart coinId={coinId}></Chart>} />
-            <Route path="price" element={<Price></Price>} />
+            <Route path="price" element={<Price coinId={coinId}></Price>} />
           </Routes>
         </>
       )}

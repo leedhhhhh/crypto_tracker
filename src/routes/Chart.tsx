@@ -42,7 +42,7 @@ function Chart({ coinId }: ChartProps) {
             },
           ]}
           options={{
-            colors: ["#e5ecf3"],
+            colors: ["#010b16"],
             theme: {
               mode: isDark ? "dark" : "light",
             },
